@@ -1,0 +1,48 @@
+﻿<Window x:Class="SQLQueryTimer.AddQueryWindow"
+        DataContext="{Binding Source={StaticResource Locator}, Path=AddQuery}"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        SizeToContent="Height"
+        Title="AddQueryWindow" Height="Auto" Width="500" MinWidth="500">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+
+        <Label Grid.Row="0" Grid.Column="0">Query Name</Label>
+        <Label Grid.Row="1" Grid.Column="0">Interval (Seconds)</Label>
+        <Label Grid.Row="2" Grid.Column="0">Connection String</Label>
+        <Label Grid.Row="3" Grid.Column="0">SQL Query</Label>
+
+        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Name, Mode=TwoWay}"></TextBox>
+        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding IntervalSeconds, Mode=TwoWay}"></TextBox>
+        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding ConnectionString, Mode=TwoWay}"></TextBox>
+        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Query, Mode=TwoWay}"></TextBox>
+
+        <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Error}" Visibility="{Binding ShowErrorLabel}" Background="Red"/>
+        <Grid Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Button Grid.Column="0" Command="{Binding ValidateCommand}">Validate</Button>
+            <Button Grid.Column="1" Command="{Binding AddCommand}" IsEnabled="{Binding AddButtonEnabled}">Add</Button>
+            <Button Grid.Column="2" Command="{Binding CancelCommand}">Cancel</Button>
+        </Grid>
+
+    </Grid>
+</Window>

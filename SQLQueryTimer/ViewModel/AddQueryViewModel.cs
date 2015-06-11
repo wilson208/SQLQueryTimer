@@ -1,0 +1,163 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
+using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.Messaging;
+using SQLQueryTimer.Model;
+using SQLQueryTimer.Utilities;
+
+namespace SQLQueryTimer.ViewModel
+{
+    public class AddQueryViewModel:ViewModelBase
+    {
+        private string name;
+        private string connectionString;
+        private string query;
+        private long intervalMilliseconds;
+
+        public AddQueryViewModel() : base()
+        {
+            AddButtonEnabled = false; 
+            ValidateCommand = new RelayCommand(() => Validate());
+            AddCommand = new RelayCommand(() => Add());
+            CancelCommand = new RelayCommand(() => Cancel());
+        }
+
+        public string Name
+        {
+            get
+            {
+                return name;
+            }
+            set
+            {
+                name = value;
+                RaisePropertyChanged(() => Name);
+            }
+        }
+
+        public string ConnectionString
+        {
+            get
+            {
+                return connectionString;
+            }
+            set
+            {
+                connectionString = value;
+                RaisePropertyChanged(() => ConnectionString);
+            }
+        }
+
+        public string Query
+        {
+            get
+            {
+                return query;
+            }
+            set
+            {
+                query = value;
+                RaisePropertyChanged(() => Query);
+            }
+        }
+
+        public int IntervalSeconds
+        {
+            get
+            {
+                return (int) (intervalMilliseconds/1000);
+            }
+            set
+            {
+                intervalMilliseconds = value*1000;
+                RaisePropertyChanged(() => IntervalSeconds);
+            }
+        }
+
+        public string Error { get; set; }
+
+        public Visibility ShowErrorLabel { get { return String.IsNullOrEmpty(Error) ? Visibility.Collapsed : Visibility.Visible; } }
+
+        public bool AddButtonEnabled { get; set; }
+        
+        public ICommand ValidateCommand { get; set; }
+        
+        public ICommand AddCommand { get; set; }
+        
+        public ICommand CancelCommand { get; set; }
+
+        public void Validate()
+        {
+            if (String.IsNullOrEmpty(Name))
+            {
+                Error = "No Name Specified";
+            }
+            else if (String.IsNullOrEmpty(ConnectionString))
+            {
+                Error = "No Connection String Specified";
+            }
+            else if (String.IsNullOrEmpty(Query))
+            {
+                Error = "No Query Specified";
+            }
+            else if (IntervalSeconds < 5)
+            {
+                Error = "Interval must be atleast 5 seconds";
+            }
+
+            if (!String.IsNullOrEmpty(Error))
+            {
+                AddButtonEnabled = false;
+                RaisePropertyChanged(() => Error);
+                RaisePropertyChanged(() => ShowErrorLabel);
+                RaisePropertyChanged(() => AddButtonEnabled);
+                return;
+            }
+
+            try
+            {
+                string result = QueryUtility.GetQueryValue(ConnectionString, Query);
+                if(String.IsNullOrEmpty(result))
+                    throw new Exception("Value returned is empty");
+
+                MessageBox.Show("Validated successfully");
+                AddButtonEnabled = true;
+                Error = "";
+                RaisePropertyChanged(() => Error);
+                RaisePropertyChanged(() => ShowErrorLabel);
+                RaisePropertyChanged(() => AddButtonEnabled);
+            }
+            catch (Exception e)
+            {
+                AddButtonEnabled = false;
+                RaisePropertyChanged(() => Error);
+                RaisePropertyChanged(() => ShowErrorLabel);
+                RaisePropertyChanged(() => AddButtonEnabled);
+            }
+        }
+
+        public void Add()
+        {
+            var query = new Query()
+            {
+                ConnectionString = ConnectionString,
+                IntervalMilliseconds = intervalMilliseconds,
+                Name = Name,
+                SqlQuery = Query
+            };
+            Messenger.Default.Send<Query>(query);
+            Messenger.Default.Send("CloseAddQueryWindow");
+        }
+
+        public void Cancel()
+        {
+            Messenger.Default.Send("CloseAddQueryWindow");
+        }
+    }
+}
