@@ -15,10 +15,10 @@ namespace SQLQueryTimer.ViewModel
 {
     public class AddQueryViewModel:ViewModelBase
     {
-        private string name;
-        private string connectionString;
-        private string query;
-        private long intervalMilliseconds;
+        private string _name;
+        private string _connectionString;
+        private string _query;
+        private long _intervalMilliseconds;
 
         public AddQueryViewModel() : base()
         {
@@ -32,11 +32,11 @@ namespace SQLQueryTimer.ViewModel
         {
             get
             {
-                return name;
+                return _name;
             }
             set
             {
-                name = value;
+                _name = value;
                 RaisePropertyChanged(() => Name);
             }
         }
@@ -45,11 +45,11 @@ namespace SQLQueryTimer.ViewModel
         {
             get
             {
-                return connectionString;
+                return _connectionString;
             }
             set
             {
-                connectionString = value;
+                _connectionString = value;
                 RaisePropertyChanged(() => ConnectionString);
             }
         }
@@ -58,11 +58,11 @@ namespace SQLQueryTimer.ViewModel
         {
             get
             {
-                return query;
+                return _query;
             }
             set
             {
-                query = value;
+                _query = value;
                 RaisePropertyChanged(() => Query);
             }
         }
@@ -71,11 +71,11 @@ namespace SQLQueryTimer.ViewModel
         {
             get
             {
-                return (int) (intervalMilliseconds/1000);
+                return (int) (_intervalMilliseconds/1000);
             }
             set
             {
-                intervalMilliseconds = value*1000;
+                _intervalMilliseconds = value*1000;
                 RaisePropertyChanged(() => IntervalSeconds);
             }
         }
@@ -147,11 +147,12 @@ namespace SQLQueryTimer.ViewModel
             var query = new Query()
             {
                 ConnectionString = ConnectionString,
-                IntervalMilliseconds = intervalMilliseconds,
+                IntervalMilliseconds = _intervalMilliseconds,
                 Name = Name,
                 SqlQuery = Query
             };
-            Messenger.Default.Send<Query>(query);
+            var message = new KeyValuePair<string, Query>("AddQuery", query);
+            Messenger.Default.Send(message);
             Messenger.Default.Send("CloseAddQueryWindow");
         }
 

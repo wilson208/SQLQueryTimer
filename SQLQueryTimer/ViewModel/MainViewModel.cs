@@ -28,19 +28,32 @@ namespace SQLQueryTimer.ViewModel
     /// </summary>
     public class MainViewModel : ViewModelBase
     {
-        private Settings settings;
-        private bool topmostWindow = false;
-        private RegistryKey runAtStartupRegistryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+        private Settings _settings;
+        private RegistryKey _runAtStartupRegistryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
 
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
         /// </summary>
         public MainViewModel()
         {
-            settings = SettingsUtility.GetSettings();
+            _settings = SettingsUtility.GetSettings();
             AddQueryCommand = new RelayCommand(() => OpenAddQueryWindow());
             ExitCommand = new RelayCommand(() => Exit());
-            Messenger.Default.Register<Query>(this, (query) => OnQueryAdded(query));
+            Messenger.Default.Register<KeyValuePair<string, Query>>(this, (query) =>
+            {
+                switch (query.Key)
+                {
+                    case "AddQuery":
+                        OnQueryAdded(query.Value);
+                        break;
+                    case "DeleteQuery":
+                        DeleteQuery(query.Value);
+                        break;
+                    case "RefreshQuery":
+                        RefreshQuery(query.Value);
+                        break;
+                }
+            });
         }
 
         public ICommand AddQueryCommand { get; set; }
@@ -48,20 +61,20 @@ namespace SQLQueryTimer.ViewModel
 
         public ObservableCollection<QueryViewModel> QueryViewModels
         {
-            get { return new ObservableCollection<QueryViewModel>(settings.Queries.Select(i => new QueryViewModel(i, this))); }
+            get { return new ObservableCollection<QueryViewModel>(_settings.Queries.Select(i => new QueryViewModel(i, this))); }
         }
 
         public bool AlwaysOnTop
         {
             get
             {
-                return settings.AlwaysOnTop;
+                return _settings.AlwaysOnTop;
             }
             set
             {
-                settings.AlwaysOnTop = value;
+                _settings.AlwaysOnTop = value;
                 RaisePropertyChanged(() => AlwaysOnTop);
-                SettingsUtility.SetSettings(settings);
+                SettingsUtility.SetSettings(_settings);
             }
         }
 
@@ -69,17 +82,17 @@ namespace SQLQueryTimer.ViewModel
         {
             get
             {
-                return (runAtStartupRegistryKey.GetValue("SQLQueryTimer") != null) ;
+                return (_runAtStartupRegistryKey.GetValue("SQLQueryTimer") != null) ;
             }
             set
             {
                 if (value)
                 {
-                    runAtStartupRegistryKey.SetValue("SQLQueryTimer", System.Reflection.Assembly.GetExecutingAssembly().Location);
+                    _runAtStartupRegistryKey.SetValue("SQLQueryTimer", System.Reflection.Assembly.GetExecutingAssembly().Location);
                 }
                 else
                 {
-                    runAtStartupRegistryKey.DeleteValue("SQLQueryTimer");
+                    _runAtStartupRegistryKey.DeleteValue("SQLQueryTimer");
                 }
                 RaisePropertyChanged(() => RunAtStartup);
             }
@@ -93,15 +106,27 @@ namespace SQLQueryTimer.ViewModel
 
         private void OnQueryAdded(Query query)
         {
-            settings.Queries.Add(query);
-            SettingsUtility.SetSettings(settings);
+            _settings.Queries.Add(query);
+            SettingsUtility.SetSettings(_settings);
             RaisePropertyChanged(() => QueryViewModels);
         }
 
         private void Exit()
         {
-            SettingsUtility.SetSettings(settings);
+            SettingsUtility.SetSettings(_settings);
             App.Current.Shutdown();
+        }
+
+        private void DeleteQuery(Query query)
+        {
+            _settings.Queries.Remove(query);
+            SettingsUtility.SetSettings(_settings);
+            RaisePropertyChanged(() => QueryViewModels);
+        }
+
+        private void RefreshQuery(Query query)
+        {
+            QueryViewModels.First(i => i.Query.Equals(query)).UpdateResult();
         }
     }
 }

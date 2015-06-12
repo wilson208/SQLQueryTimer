@@ -30,6 +30,12 @@
         </Grid>
         <Line X1="10" Y1="10" X2="50" Y2="50" StrokeThickness="10" Margin="0,0,5,5"/>
         <DataGrid HorizontalAlignment="Stretch" HorizontalScrollBarVisibility="Hidden" Grid.Row="2" Grid.Column="0" AutoGenerateColumns="False" ItemsSource="{Binding QueryViewModels}">
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Refresh" Click="MenuItemRefresh_OnClick"></MenuItem>
+                    <MenuItem Header="Delete" Click="MenuItemDelete_OnClick"></MenuItem>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
             <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding Query.Name}" Width="auto" Header="Query"/>
                 <DataGridTextColumn Binding="{Binding LastValue}" Width="auto" Header="Result"/>

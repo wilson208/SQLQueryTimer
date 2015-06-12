@@ -14,23 +14,23 @@ namespace SQLQueryTimer.ViewModel
 {
     public class QueryViewModel:ViewModelBase
     {
-        private Query query;
-        private String lastValue;
-        private DateTime lastUpdated;
-        private MainViewModel parentViewModel;
-        private Timer timer;
+        private Query _query;
+        private String _lastValue;
+        private DateTime _lastUpdated;
+        private MainViewModel _parentViewModel;
+        private Timer _timer;
 
         public QueryViewModel(Query query, MainViewModel parentViewModel) : base()
         {
             this.Query = query;
             this.LastValue = null;
             this.LastUpdated = default(DateTime);
-            this.parentViewModel = parentViewModel;
+            this._parentViewModel = parentViewModel;
 
-            this.timer = new Timer();
-            this.timer.Enabled = false;
-            this.timer.Interval = query.IntervalMilliseconds;
-            this.timer.Elapsed += timer_Elapsed;
+            this._timer = new Timer();
+            this._timer.Enabled = false;
+            this._timer.Interval = query.IntervalMilliseconds;
+            this._timer.Elapsed += timer_Elapsed;
 
             this.timer_Elapsed(null, null);
             TimerEnabled = true;
@@ -40,11 +40,11 @@ namespace SQLQueryTimer.ViewModel
         {
             get
             {
-                return query;
+                return _query;
             }
             set
             {
-                query = value;
+                _query = value;
                 RaisePropertyChanged(() => LastUpdated);
             }
         }
@@ -53,13 +53,13 @@ namespace SQLQueryTimer.ViewModel
         {
             get
             {
-                if (lastValue == null)
+                if (_lastValue == null)
                     return "";
-                return lastValue;
+                return _lastValue;
             }
             set
             {
-                lastValue = value;
+                _lastValue = value;
                 RaisePropertyChanged(() => LastValue);
                 RaisePropertyChanged(() => Status);
             }
@@ -68,21 +68,21 @@ namespace SQLQueryTimer.ViewModel
         {
             get
             {
-                return lastUpdated;
+                return _lastUpdated;
             }
             set
             {
-                lastUpdated = value;
+                _lastUpdated = value;
                 RaisePropertyChanged(() => LastUpdated);
                 RaisePropertyChanged(() => Status);
             }
         }
         public bool TimerEnabled
         {
-            get { return timer.Enabled; }
+            get { return _timer.Enabled; }
             set
             {
-                timer.Enabled = value;
+                _timer.Enabled = value;
                 RaisePropertyChanged(() => TimerEnabled);
                 RaisePropertyChanged(() => Status);
             }
@@ -106,7 +106,7 @@ namespace SQLQueryTimer.ViewModel
             }
         }
 
-        private void timer_Elapsed(object sender, ElapsedEventArgs e)
+        public void UpdateResult()
         {
             try
             {
@@ -124,6 +124,11 @@ namespace SQLQueryTimer.ViewModel
                 MessageBox.Show("Unhandled error ocurred", ex.Message, MessageBoxButton.OK, MessageBoxImage.Error);
                 //Log Exception
             }
+        }
+
+        private void timer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            UpdateResult();
         }
     }
 }
