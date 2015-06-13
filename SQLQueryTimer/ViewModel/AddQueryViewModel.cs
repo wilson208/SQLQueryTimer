@@ -80,6 +80,13 @@ namespace SQLQueryTimer.ViewModel
             }
         }
 
+        public List<QueryType> QueryTypes
+        {
+            get { return Enum.GetNames(typeof (QueryType)).Select(i => (QueryType)Enum.Parse(typeof (QueryType), i)).ToList(); }
+        }
+
+        public QueryType QueryType { get; set; }
+
         public string Error { get; set; }
 
         public Visibility ShowErrorLabel { get { return String.IsNullOrEmpty(Error) ? Visibility.Collapsed : Visibility.Visible; } }
@@ -122,7 +129,7 @@ namespace SQLQueryTimer.ViewModel
 
             try
             {
-                string result = QueryUtility.GetQueryValue(ConnectionString, Query);
+                string result = QueryUtility.GetQueryValue(ConnectionString, Query, QueryType);
                 if(String.IsNullOrEmpty(result))
                     throw new Exception("Value returned is empty");
 
@@ -149,7 +156,8 @@ namespace SQLQueryTimer.ViewModel
                 ConnectionString = ConnectionString,
                 IntervalMilliseconds = _intervalMilliseconds,
                 Name = Name,
-                SqlQuery = Query
+                SqlQuery = Query,
+                QueryType = QueryType
             };
             var message = new KeyValuePair<string, Query>("AddQuery", query);
             Messenger.Default.Send(message);

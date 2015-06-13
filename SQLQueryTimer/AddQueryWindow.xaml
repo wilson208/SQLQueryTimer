@@ -12,6 +12,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
@@ -21,15 +22,17 @@
 
         <Label Grid.Row="0" Grid.Column="0">Query Name</Label>
         <Label Grid.Row="1" Grid.Column="0">Interval (Seconds)</Label>
-        <Label Grid.Row="2" Grid.Column="0">Connection String</Label>
-        <Label Grid.Row="3" Grid.Column="0">SQL Query</Label>
+        <Label Grid.Row="2" Grid.Column="0">Database Type</Label>
+        <Label Grid.Row="3" Grid.Column="0">Connection String</Label>
+        <Label Grid.Row="4" Grid.Column="0">SQL Query</Label>
 
         <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Name, Mode=TwoWay}"></TextBox>
         <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding IntervalSeconds, Mode=TwoWay}"></TextBox>
-        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding ConnectionString, Mode=TwoWay}"></TextBox>
-        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Query, Mode=TwoWay}"></TextBox>
+        <ComboBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding QueryTypes}" SelectedItem="{Binding QueryType, Mode=TwoWay}" />
+        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding ConnectionString, Mode=TwoWay}"></TextBox>
+        <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding Query, Mode=TwoWay}"></TextBox>
 
-        <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Error}" Visibility="{Binding ShowErrorLabel}" Background="Red"/>
+        <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Error}" Visibility="{Binding ShowErrorLabel}" Background="Red"/>
         <Grid Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>

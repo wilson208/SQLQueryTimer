@@ -12,5 +12,6 @@ namespace SQLQueryTimer.Model
         public string SqlQuery { get; set; }
         public string ConnectionString { get; set; }
         public long IntervalMilliseconds { get; set; }
+        public QueryType QueryType { get; set; }
     }
 }

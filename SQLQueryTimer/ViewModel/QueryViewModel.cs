@@ -110,7 +110,7 @@ namespace SQLQueryTimer.ViewModel
         {
             try
             {
-                LastValue = QueryUtility.GetQueryValue(Query.ConnectionString, Query.SqlQuery);
+                LastValue = QueryUtility.GetQueryValue(Query.ConnectionString, Query.SqlQuery, Query.QueryType);
                 LastUpdated = DateTime.Now;
             }
             catch (QueryException ex)
